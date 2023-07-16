@@ -13,7 +13,7 @@ from django_redis import get_redis_connection
 from .models import User
 
 
-class UserModelSerializer(serializers.ModelSerializer):
+class UserCreateModelSerializer(serializers.ModelSerializer):
     """ 注册用户序列化器 """
     password2 = serializers.CharField(label='确认密码', max_length=32, min_length=6, write_only=True)
     sms_code = serializers.CharField(label='验证码', max_length=6, min_length=4, write_only=True)
@@ -92,3 +92,16 @@ class UserModelSerializer(serializers.ModelSerializer):
         user.token = token
 
         return user
+
+
+class UserRetrieveModelSerializer(serializers.ModelSerializer):
+    """ 用户详情页面序列化器 """
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'mobile', 'email', 'email_active']
+        extra_kwargs = {
+            'email': {
+                'required': True
+            }
+        }
