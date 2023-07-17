@@ -184,6 +184,7 @@ LOGGING = {
 }
 
 AUTH_USER_MODEL = 'users.user'  # 修改Django认证系统的用户模型
+AUTHENTICATION_BACKENDS = ["apps.users.utils.UsernameMobileAuthModelBackend"]  # 修改django认证后端类
 
 # redis库
 CACHES = {
