@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'apps.users',  # 用户模型
     'apps.oauth',  # qq第三方登录
     'apps.areas',  # 省市区
+    'apps.goods',  # 商品
+    'apps.contents',  # 商品广告
 ]
 
 MIDDLEWARE = [
