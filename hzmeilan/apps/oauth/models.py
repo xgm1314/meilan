@@ -7,8 +7,8 @@ from apps.users.models import User
 # Create your models here.
 class OauthQQUser(BaseModels):
     """ QQ登录 """
-    user = models.ForeignKey(verbose_name='用户', to=User, on_delete=models.CASCADE)
-    openid = models.CharField(verbose_name='openid', max_length=64, db_index=True)
+    user = models.ForeignKey(verbose_name='用户', to=User, on_delete=models.CASCADE, help_text='用户')
+    openid = models.CharField(verbose_name='openid', max_length=64, db_index=True, help_text='openid')
 
     class Meta:
         db_table = 'tb_oauth_qq'

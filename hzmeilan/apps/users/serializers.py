@@ -12,7 +12,7 @@ from django_redis import get_redis_connection
 
 from django.conf import settings
 
-from .models import User
+from .models import User, Address
 
 
 class UserCreateModelSerializer(serializers.ModelSerializer):
@@ -157,3 +157,29 @@ class EmailUpdateModelSerializer(serializers.ModelSerializer):
         )
 
         return instance
+
+
+class AddressGenericModelSerializer(serializers.ModelSerializer):
+    """ 用户地址的增删改查 """
+
+    class Meta:
+        model = Address
+        exclude = ['user', 'is_deleted', 'create_time', 'update_time']
+
+    def validate_mobile(self, value):
+        if not re.match('1[345789]\d{9}', value):
+            raise serializers.ValidationError('手机号不正确')
+        return value
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        validated_data['user'] = user
+        return Address.objects.create(**validated_data)
+
+
+class TitleModelSerializer(serializers.ModelSerializer):
+    """ 修改标题序列化器 """
+
+    class Meta:
+        model = Address
+        fields = ['title']
