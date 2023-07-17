@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
     # 子应用
     'apps.users',  # 用户模型
+    'apps.oauth',  # qq第三方登录
 ]
 
 MIDDLEWARE = [
@@ -214,6 +215,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "session"
 
 REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'utils.exceptions.exception_handler',  # 异常处理
     'DATETIME_FORMAT': '%Y-%m-%d %H-%M-%S',  # 时间相关的字段
     'DEFAULT_RENDER_CLASSES': [  # 当drf返回response对象时，应用哪一个render类
         'rest_framework.renderers.JSONRenderer',
@@ -252,3 +254,11 @@ EMAIL_PORT = 25
 EMAIL_HOST_USER = 'fyq31780209@163.com'
 # 在邮箱中设置的客户端授权密码
 EMAIL_HOST_PASSWORD = 'WBGDQNICFJVQSEWZ'
+
+# QQ登录参数
+# 我们申请的 客户端id
+QQ_CLIENT_ID = '101474184'
+# 我们申请的 客户端秘钥
+QQ_CLIENT_SECRET = 'c6ce949e04e12ecc909ae6a8b09b637c'
+# 我们申请时添加的: 登录成功后回调的路径
+QQ_REDIRECT_URI = 'http://www.meiduo.site:8080/oauth_callback.html'

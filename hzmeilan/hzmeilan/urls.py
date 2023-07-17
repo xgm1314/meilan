@@ -21,4 +21,5 @@ urlpatterns = [
 
     path('', include('apps.users.urls')),  # 用户模型
     path('', include('apps.verifications.urls')),  # 短信验证码
+    path('', include('apps.oauth.urls')),  # qq第三方登录
 ]

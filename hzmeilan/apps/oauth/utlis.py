@@ -1,33 +1,17 @@
 # _*_coding : uft-8 _*_
-# @Time : 2023/7/16 14:43
+# @Time : 2023/7/16 17:37
 # @Author : 
-# @File : uilt
+# @File : utlis
 # @Project : hzmeilan
-from rest_framework.response import Response
 
 from django.conf import settings
 
 from itsdangerous import TimedJSONWebSignatureSerializer as TJWSSerializer, BadData
 
-from . import constants
+from apps.oauth import constants
 
 
-def jwt_response_payload_handler(token, user=None, request=None):
-    """
-    重构jwt_response_payload_handler方法，使其返回更多数据(源数据只可返回token数据)
-    @param token:传入的token数据
-    @param user:登录用户数据
-    @param request:请求体
-    @return:返回token、用户id、用户姓名
-    """
-    return {
-        'token': token,
-        'user_id': user.id,
-        'username': user.username
-    }
-
-
-def generic_openid(openid, email):
+def generic_openid(openid):
     """
     数据加密
     @param openid: 传入的token数据进行加密
@@ -35,7 +19,7 @@ def generic_openid(openid, email):
     """
     open_serializer = TJWSSerializer(secret_key=settings.SECRET_KEY,
                                      expires_in=constants.TIMED_JSON_WEB_SIGNATURE_SERIALIZER_EXPIRES_IN)
-    access_token = open_serializer.dumps({'openid': openid, 'email': email})
+    access_token = open_serializer.dumps({'openid': openid})
     return access_token.decode()
 
 
@@ -52,4 +36,4 @@ def check_access_token(token):
     except BadData:
         return None
     else:
-        return access_token
+        return access_token.get('openid')
