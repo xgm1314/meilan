@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     # 第三方应用
     'rest_framework',  # 注册drf
     'rest_framework.authtoken',  # drf自带的token认证
+    'ckeditor',  # 富文本编辑器
+    'ckeditor_uploader',  # 富文本编辑器上传图片模块
 
     # 子应用
     'apps.users',  # 用户模型
@@ -67,7 +69,7 @@ ROOT_URLCONF = 'hzmeilan.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -241,6 +243,9 @@ REST_FRAMEWORK = {
     ],
 }
 
+CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
+CORS_ORIGIN_ALLOW_ALL = True
+
 # JWT的有效期
 JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
@@ -266,3 +271,22 @@ QQ_CLIENT_ID = '101474184'
 QQ_CLIENT_SECRET = 'c6ce949e04e12ecc909ae6a8b09b637c'
 # 我们申请时添加的: 登录成功后回调的路径
 QQ_REDIRECT_URI = 'http://www.meiduo.site:8080/oauth_callback.html'
+
+# DRF扩展配置省市区数据缓存
+REST_FRAMEWORK_EXTENSIONS = {
+    'DEFAULT_CACHE_RESPONSE_TIMEOUT': 60 * 60,  # 缓存时间
+    'DEFAULT_USE_CACHE': 'default',  # 缓存存储
+}
+
+# 富文本编辑器ckeditor配置
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',  # 工具条功能
+        'height': 300,  # 编辑器高度
+        # 'width': 300,  # 编辑器宽度
+    },
+}
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, '/media/')
+CKEDITOR_UPLOAD_PATH = 'image/'  # 上传图片保存的路径，使用FastDFS设置为空
+GENERATED_STATIC_HTML_FILES_DIR = os.path.join(BASE_DIR, 'templates/templates')  # 静态化主页存储路径
