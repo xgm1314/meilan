@@ -23,4 +23,5 @@ urlpatterns = [
     path('', include('apps.verifications.urls')),  # 短信验证码
     path('', include('apps.oauth.urls')),  # qq第三方登录
     path('', include('apps.areas.urls')),  # 省市区
+    path('', include('apps.goods.urls')),  # 商品
 ]

@@ -222,25 +222,28 @@ SESSION_CACHE_ALIAS = "session"
 
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'utils.exceptions.exception_handler',  # 异常处理
-    'DATETIME_FORMAT': '%Y-%m-%d %H-%M-%S',  # 时间相关的字段
-    'DEFAULT_RENDER_CLASSES': [  # 当drf返回response对象时，应用哪一个render类
-        'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
-    ],
-    'DEFAULT_PARSER_CLASSES': [  # 解析器如何解析request中的request.data
-        'rest_framework.parsers.JSONParser',
-        'rest_framework.parsers.FormParser',
-        'rest_framework.parsers.MultipartParser',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [  # 权限
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+    # 'DATETIME_FORMAT': '%Y-%m-%d %H-%M-%S',  # 时间相关的字段
+    # 'DEFAULT_RENDER_CLASSES': [  # 当drf返回response对象时，应用哪一个render类
+    #     'rest_framework.renderers.JSONRenderer',
+    #     'rest_framework.renderers.BrowsableAPIRenderer',
+    # ],
+    # 'DEFAULT_PARSER_CLASSES': [  # 解析器如何解析request中的request.data
+    #     'rest_framework.parsers.JSONParser',
+    #     'rest_framework.parsers.FormParser',
+    #     'rest_framework.parsers.MultipartParser',
+    # ],
+    # 'DEFAULT_PERMISSION_CLASSES': [  # 权限
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # JWT认证类，放在第一位是默认项
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',  # drf自带的token认证
+        # 'rest_framework.authentication.TokenAuthentication',  # drf自带的token认证
     ],
+    # 分页
+    'DEFAULT_PAGINATION_CLASS': 'utils.page.PageNum',
+    'PAGE_SIZE': 10,
 }
 
 CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
