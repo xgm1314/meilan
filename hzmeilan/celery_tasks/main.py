@@ -11,4 +11,4 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'hzmeilan.settings')  # 为celer
 
 celery_app = Celery('meiduo')  # 创建celery实例对象
 celery_app.config_from_object('celery_tasks.config')  # 加载配置文件
-celery_app.autodiscover_tasks(['celery_tasks.sms', 'celery_tasks.email'])  # 自动注册异步任务
+celery_app.autodiscover_tasks(['celery_tasks.sms', 'celery_tasks.email', 'celery_tasks.html'])  # 自动注册异步任务
