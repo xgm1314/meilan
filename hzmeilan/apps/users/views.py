@@ -1,5 +1,7 @@
 from django.shortcuts import render
 
+from django_redis import get_redis_connection
+
 from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
@@ -11,9 +13,10 @@ from rest_framework.decorators import action
 
 from . import constants
 from .serializers import UserCreateModelSerializer, UserRetrieveModelSerializer, EmailUpdateModelSerializer, \
-    AddressGenericModelSerializer, TitleModelSerializer
+    AddressGenericModelSerializer, TitleModelSerializer, UserBrowserHistorySerializer, SKUModelSerializer
 from .models import User, Address
 from .utils import check_access_token
+from apps.goods.models import SKU
 
 
 # Create your views here.
@@ -129,3 +132,21 @@ class AddressGenericViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet
         request.user.save()
         response = Response({'message': 'ok'}, status=status.HTTP_201_CREATED)
         return response
+
+
+class UserBrowserHistoryCreateAPIView(CreateAPIView):
+    """ 用户浏览记录 """
+    queryset = ''
+    serializer_class = UserBrowserHistorySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        redis_conn = get_redis_connection('history')
+        redis_sku_id = redis_conn.lrange('history_%s' % user.id, 0, -1)
+        sku_list = []
+        for sku_id in redis_sku_id:
+            sku = SKU.objects.get(id=sku_id)
+            sku_list.append(sku)
+        serializer = SKUModelSerializer(instance=sku_list, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)

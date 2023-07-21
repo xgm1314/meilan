@@ -13,6 +13,7 @@ from django_redis import get_redis_connection
 from django.conf import settings
 
 from .models import User, Address
+from apps.goods.models import SKU
 
 
 class UserCreateModelSerializer(serializers.ModelSerializer):
@@ -183,3 +184,34 @@ class TitleModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
         fields = ['title']
+
+
+class UserBrowserHistorySerializer(serializers.Serializer):
+    """ 用户浏览记录保存 """
+    sku_id = serializers.IntegerField(label='商品sku_id', min_value=1)
+
+    def validate_sku_id(self, value):
+        try:
+            SKU.objects.get(id=value)
+        except SKU.DoesNotExist:
+            raise serializers.ValidationError('商品信息不存在')
+        return value
+
+    def create(self, validated_data):
+        sku_id = validated_data.get('sku_id')
+        user = self.context['request'].user  # 获取用户模型对象
+        redis_conn = get_redis_connection('history')
+        pipeline = redis_conn.pipeline()
+        pipeline.lrem('history_%s' % user.id, 0, sku_id)  # 去重
+        pipeline.lpush('history_%s' % user.id, sku_id)  # 添加到表头
+        pipeline.ltrim('history_%s' % user.id, 0, 4)  # 取前五个元素
+        pipeline.execute()  # 执行管道
+        return validated_data
+
+
+class SKUModelSerializer(serializers.ModelSerializer):
+    """ 用户浏览记录序列化器 """
+
+    class Meta:
+        model = SKU
+        fields = ['id', 'name', 'price', 'default_image', 'comments']
