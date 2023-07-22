@@ -12,6 +12,7 @@ from QQLoginTool.QQtool import OAuthQQ
 from .models import OauthQQUser
 from .utlis import generic_openid
 from .serializers import OauthQQSerializer
+from apps.carts.utils import merge_cart_cookie_to_redis
 
 logger = logging.getLogger('django')
 
@@ -79,6 +80,8 @@ class OauthQQAPIView(APIView):
             'username': user.username
         })
 
+        merge_cart_cookie_to_redis(request, user, response)
+
         return response
 
     def post(self, request):
@@ -103,5 +106,7 @@ class OauthQQAPIView(APIView):
             'user_id': user.id,
             'username': user.username
         })
+
+        merge_cart_cookie_to_redis(request, user, response)
 
         return response
