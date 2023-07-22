@@ -42,7 +42,7 @@ INSTALLED_APPS = [
 
     # 第三方应用
     'rest_framework',  # 注册drf
-    'rest_framework.authtoken',  # drf自带的token认证
+    # 'rest_framework.authtoken',  # drf自带的token认证
     'ckeditor',  # 富文本编辑器
     'ckeditor_uploader',  # 富文本编辑器上传图片模块
 
@@ -221,6 +221,13 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     },
+    "cart": {  # 浏览记录
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/4",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
 }
 
 # session信息保存到redis数据库的1号库
@@ -229,6 +236,9 @@ SESSION_CACHE_ALIAS = "session"
 
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'utils.exceptions.exception_handler',  # 异常处理
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [
+    # 'rest_framework_jwt.authentication.JSONWebTokenAuthentication'
+    # ]
     # 'DATETIME_FORMAT': '%Y-%m-%d %H-%M-%S',  # 时间相关的字段
     # 'DEFAULT_RENDER_CLASSES': [  # 当drf返回response对象时，应用哪一个render类
     #     'rest_framework.renderers.JSONRenderer',
@@ -239,10 +249,11 @@ REST_FRAMEWORK = {
     #     'rest_framework.parsers.FormParser',
     #     'rest_framework.parsers.MultipartParser',
     # ],
-    # 'DEFAULT_PERMISSION_CLASSES': [  # 权限
-    #     'rest_framework.permissions.IsAuthenticated',
-    # ],
+    'DEFAULT_PERMISSION_CLASSES': [  # 权限
+        'rest_framework.permissions.IsAuthenticated',
+    ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',  # JWT认证类，放在第一位是默认项
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
