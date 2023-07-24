@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'apps.areas',  # 省市区
     'apps.goods',  # 商品
     'apps.contents',  # 商品广告
+    'apps.orders',  # 订单
 ]
 
 MIDDLEWARE = [
