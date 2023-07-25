@@ -147,3 +147,39 @@ class CommitOrderModelSerializer(serializers.ModelSerializer):
 
         pipeline.execute()
         return orderinfo
+
+
+class SKUModelSerializer(serializers.ModelSerializer):
+    """ 商品展示 """
+
+    class Meta:
+        model = SKU
+        fields = ['name', 'caption', 'price', 'default_image']
+
+
+class OrderGoodsModelSerializer(serializers.ModelSerializer):
+    """ 订单商品序列化器 """
+    sku = SKUModelSerializer()
+
+    class Meta:
+        model = OrderGoods
+        fields = ['sku', 'count']
+
+
+class OrderInfoModelSerializer(serializers.ModelSerializer):
+    """ 订单信息查看序列化器 """
+    skus = OrderGoodsModelSerializer(many=True)
+
+    # order_id = serializers.IntegerField(label='订单编号', help_text='订单编号')
+
+    class Meta:
+        model = OrderInfo
+        fields = ['order_id', 'create_time', 'status', 'pay_method', 'skus']
+
+
+class OrderInfoDeleteModelSerializer(serializers.ModelSerializer):
+    """ 逻辑删除序列化器 """
+
+    class Meta:
+        model = OrderInfo
+        fields = ['is_deleted']

@@ -5,12 +5,14 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, UpdateAPIView
 
 from decimal import Decimal
 
 from apps.goods.models import SKU
-from .serializers import OrderSettlementSerializer, CommitOrderModelSerializer
+from .serializers import OrderSettlementSerializer, CommitOrderModelSerializer, OrderInfoModelSerializer, \
+    OrderInfoDeleteModelSerializer
+from .models import OrderInfo
 
 
 # Create your views here.
@@ -53,3 +55,39 @@ class CommitOrderCreateAPIView(CreateAPIView):
 
     # def get_queryset(self):
     #     return self.request.user.addresses.filter(is_deleted=False)
+
+
+class OrderListAPIView(APIView):
+    """ 查看订单 """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        data = OrderInfo.objects.filter(user=user, is_deleted=False)
+        serializer = OrderInfoModelSerializer(instance=data, many=True)
+        response = Response(data=serializer.data, status=status.HTTP_200_OK)
+        return response
+
+
+class OrderDestroyAPIView(APIView):
+    """ 删除订单(逻辑删除) """
+    permission_classes = [IsAuthenticated]
+
+    """
+    测试数据
+    {"order_id":"20230723161916000001","is_deleted":"true"}
+    """
+
+    def put(self, request, pk=None):
+        user = request.user
+        queryset = request.data
+        try:
+            data = OrderInfo.objects.get(user=user, order_id=pk, is_deleted=False)
+        except OrderInfo.DoesNotExist:
+            return Response({'message': '该订单不存在'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = OrderInfoDeleteModelSerializer(instance=data, data=queryset)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        else:
+            return Response({'message': '删除错误'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -40,6 +40,7 @@ class OrderInfo(BaseModels):
     freight = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="运费")
     pay_method = models.SmallIntegerField(choices=PAY_METHOD_CHOICES, default=1, verbose_name="支付方式")
     status = models.SmallIntegerField(choices=ORDER_STATUS_CHOICES, default=1, verbose_name="订单状态")
+    is_deleted = models.BooleanField(verbose_name='是否删除', default=False, help_text='是否删除')
 
     class Meta:
         db_table = "tb_order_info"
