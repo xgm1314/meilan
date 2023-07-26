@@ -11,8 +11,8 @@ from decimal import Decimal
 
 from apps.goods.models import SKU
 from .serializers import OrderSettlementSerializer, CommitOrderModelSerializer, OrderInfoModelSerializer, \
-    OrderInfoDeleteModelSerializer
-from .models import OrderInfo
+    OrderInfoDeleteModelSerializer, CancellationOrderModelSerializer
+from .models import OrderInfo, OrderGoods
 
 
 # Create your views here.
@@ -91,3 +91,42 @@ class OrderDestroyAPIView(APIView):
         else:
             return Response({'message': '删除错误'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CancellationOrderUpdateAPIView(APIView):
+    """ 取消订单 """
+    permission_classes = [IsAuthenticated]
+
+    # serializer_class = CancellationOrderModelSerializer
+
+    def put(self, request):
+        user = request.user
+        order_id = request.data['order_id']
+        try:
+            queryset = OrderInfo.objects.get(user=user, order_id=order_id, is_deleted=False)
+        except OrderInfo.DoesNotExist:
+            return Response({'message': '订单异常'}, status=status.HTTP_404_NOT_FOUND)
+
+        # goods = OrderGoods.objects.filter(order_id=queryset)
+        #
+        # for good in goods:
+        #     sku = SKU.objects.get(id=good.id)
+        #     order_count = good.count
+        #
+        #     sku.stock += order_count
+        #     sku.sales -= order_count
+        #     sku.save()
+        #
+        #     spu = sku.spu
+        #     spu.sales -= order_count
+        #     spu.save()
+        #
+        # OrderInfo.objects.filter(order_id=order_id).update(status=OrderInfo.ORDER_STATUS_ENUM['CANCELED'])
+
+        serializer = CancellationOrderModelSerializer(instance=queryset, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        else:
+            return Response({'message': '订单取消失败'})
+
+        return Response({'message': '订单取消成功'})

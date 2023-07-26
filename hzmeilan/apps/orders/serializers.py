@@ -183,3 +183,40 @@ class OrderInfoDeleteModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderInfo
         fields = ['is_deleted']
+
+
+class CancellationOrderModelSerializer(serializers.ModelSerializer):
+    """ 取消订单序列化器 """
+
+    class Meta:
+        model = OrderInfo
+        fields = ['order_id']
+
+    def validate_order_id(self, value):
+        try:
+            orderinfo = OrderInfo.objects.get(order_id=value, is_deleted=False)
+            if orderinfo.status == OrderInfo.ORDER_STATUS_ENUM['CANCELED']:
+                raise serializers.ValidationError('订单已取消')
+            elif orderinfo.status == OrderInfo.ORDER_STATUS_ENUM['FINISHED']:
+                raise serializers.ValidationError('订单已完成,取消失败')
+        except OrderInfo.DoesNotExist:
+            raise serializers.ValidationError('订单信息不存在')
+        return value
+
+    def update(self, instance, validated_data):
+        order_id = validated_data.get('order_id')
+        goods = OrderGoods.objects.filter(order_id=order_id)
+        for order_good in goods:
+            sku = SKU.objects.get(id=order_good.id)
+            order_count = order_good.count
+
+            sku.stock += order_count
+            sku.sales -= order_count
+            sku.save()
+
+            spu = sku.spu
+            spu.sales -= order_count
+            spu.save()
+
+        OrderInfo.objects.filter(order_id=order_id).update(status=OrderInfo.ORDER_STATUS_ENUM['CANCELED'])
+        return validated_data
