@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # 'rest_framework.authtoken',  # drf自带的token认证
     'ckeditor',  # 富文本编辑器
     'ckeditor_uploader',  # 富文本编辑器上传图片模块
+    'drf_yasg',  # API生成器
 
     # 子应用
     'apps.users',  # 用户模型
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
     'apps.goods',  # 商品
     'apps.contents',  # 商品广告
     'apps.orders',  # 订单
+    'apps.payment',  # 支付宝支付
 ]
 
 MIDDLEWARE = [
@@ -250,11 +252,12 @@ REST_FRAMEWORK = {
     #     'rest_framework.parsers.FormParser',
     #     'rest_framework.parsers.MultipartParser',
     # ],
-    'DEFAULT_PERMISSION_CLASSES': [  # 权限
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+
+    # 'DEFAULT_PERMISSION_CLASSES': [  # 权限
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        # 'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',  # JWT认证类，放在第一位是默认项
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
@@ -263,6 +266,8 @@ REST_FRAMEWORK = {
     # 分页
     'DEFAULT_PAGINATION_CLASS': 'utils.page.PageNum',
     'PAGE_SIZE': 10,
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+
 }
 
 CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
@@ -312,3 +317,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, '/media/')
 CKEDITOR_UPLOAD_PATH = 'image/'  # 上传图片保存的路径，使用FastDFS设置为空
 GENERATED_STATIC_HTML_FILES_DIR = os.path.join(BASE_DIR, 'templates/templates')  # 静态化主页存储路径
+
+# 支付宝支付参数
+ALIPAY_APPID = '2016091600523030'
+ALIPAY_DEBUG = True
+ALIPAY_URL = 'https://openapi.alipaydev.com/gateway.do'
+ALIPAY_RETURN_URL = 'http://www.meiduo.site:8080/pay_success.html'
